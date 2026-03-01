@@ -1,0 +1,88 @@
+package com.example.newreelmate;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class ProfileActivity extends AppCompatActivity {
+
+    private ActivityResultLauncher<Intent> editProfileLauncher;
+    private TextView userNameTextView;
+    private TextView userEmailTextView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_profile);
+
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        userNameTextView = findViewById(R.id.userNameTextView);
+        userEmailTextView = findViewById(R.id.userEmailTextView);
+
+        editProfileLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        String name = result.getData().getStringExtra("PROFILE_NAME");
+                        String email = result.getData().getStringExtra("PROFILE_EMAIL");
+                        if (name != null && !name.trim().isEmpty()) {
+                            userNameTextView.setText(name.trim());
+                        }
+                        if (email != null && !email.trim().isEmpty()) {
+                            userEmailTextView.setText(email.trim());
+                        }
+                    }
+                }
+            }
+        );
+
+        Button editProfileButton = findViewById(R.id.editProfileButton);
+        Button settingsButton = findViewById(R.id.settingsButton);
+        Button logoutButton = findViewById(R.id.logoutButton);
+
+        editProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+                intent.putExtra("PROFILE_NAME", userNameTextView.getText().toString());
+                intent.putExtra("PROFILE_EMAIL", userEmailTextView.getText().toString());
+                editProfileLauncher.launch(intent);
+            }
+        });
+
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ProfileActivity.this, SettingsActivity.class));
+            }
+        });
+
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            }
+        });
+    }
+}

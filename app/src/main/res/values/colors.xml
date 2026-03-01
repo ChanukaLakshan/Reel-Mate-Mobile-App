@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- ReelMate Color Palette -->
+    <color name="background_primary">#121212</color>
+    <color name="background_secondary">#1E1E1E</color>
+    <color name="background_tertiary">#242424</color>
+    <color name="border_color">#2A2A2A</color>
+
+    <color name="primary_red">#E50914</color>
+    <color name="primary_red_dark">#B20710</color>
+    <color name="primary_yellow">#F5C518</color>
+    <color name="primary_yellow_dark">#D4A817</color>
+
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B3B3B3</color>
+
+    <color name="success_color">#22C55E</color>
+    <color name="success_color_dark">#16A34A</color>
+
+    <color name="rating_star">#FFD700</color>
+</resources>
+
