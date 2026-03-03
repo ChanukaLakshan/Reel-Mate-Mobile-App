@@ -2,11 +2,9 @@ package com.example.newreelmate;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -14,27 +12,33 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.newreelmate.database.ReelMateRepository;
+import com.example.newreelmate.database.SessionManager;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> editProfileLauncher;
     private TextView userNameTextView;
     private TextView userEmailTextView;
+    private SessionManager sessionManager;
+    private ReelMateRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        sessionManager = new SessionManager(this);
+        repository = new ReelMateRepository(this);
+
         ImageButton backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
 
         userNameTextView = findViewById(R.id.userNameTextView);
         userEmailTextView = findViewById(R.id.userEmailTextView);
+
+        // Load user from DB
+        loadUserProfile();
 
         editProfileLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -46,9 +50,11 @@ public class ProfileActivity extends AppCompatActivity {
                         String email = result.getData().getStringExtra("PROFILE_EMAIL");
                         if (name != null && !name.trim().isEmpty()) {
                             userNameTextView.setText(name.trim());
+                            sessionManager.updateName(name.trim());
                         }
                         if (email != null && !email.trim().isEmpty()) {
                             userEmailTextView.setText(email.trim());
+                            sessionManager.updateEmail(email.trim());
                         }
                     }
                 }
@@ -59,30 +65,42 @@ public class ProfileActivity extends AppCompatActivity {
         Button settingsButton = findViewById(R.id.settingsButton);
         Button logoutButton = findViewById(R.id.logoutButton);
 
-        editProfileButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-                intent.putExtra("PROFILE_NAME", userNameTextView.getText().toString());
-                intent.putExtra("PROFILE_EMAIL", userEmailTextView.getText().toString());
-                editProfileLauncher.launch(intent);
-            }
+        editProfileButton.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+            intent.putExtra("PROFILE_NAME", userNameTextView.getText().toString());
+            intent.putExtra("PROFILE_EMAIL", userEmailTextView.getText().toString());
+            editProfileLauncher.launch(intent);
         });
 
-        settingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(ProfileActivity.this, SettingsActivity.class));
-            }
-        });
+        settingsButton.setOnClickListener(v ->
+            startActivity(new Intent(ProfileActivity.this, SettingsActivity.class))
+        );
 
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            }
+        logoutButton.setOnClickListener(v -> {
+            sessionManager.clearSession();
+            Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         });
+    }
+
+    private void loadUserProfile() {
+        int userId = sessionManager.getUserId();
+        if (userId != -1) {
+            repository.getUserById(userId, user -> {
+                if (user != null) {
+                    userNameTextView.setText(user.name);
+                    userEmailTextView.setText(user.email);
+                    sessionManager.updateName(user.name);
+                    sessionManager.updateEmail(user.email);
+                } else {
+                    userNameTextView.setText(sessionManager.getUserName());
+                    userEmailTextView.setText(sessionManager.getUserEmail());
+                }
+            });
+        } else {
+            userNameTextView.setText(sessionManager.getUserName());
+            userEmailTextView.setText(sessionManager.getUserEmail());
+        }
     }
 }

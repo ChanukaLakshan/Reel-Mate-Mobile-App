@@ -2,9 +2,7 @@ package com.example.newreelmate;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.newreelmate.adapters.MovieAdapter;
 import com.example.newreelmate.api.TMDBRepository;
 import com.example.newreelmate.data.DataProvider;
+import com.example.newreelmate.database.ReelMateRepository;
+import com.example.newreelmate.database.SessionManager;
 import com.example.newreelmate.models.Movie;
 
 import java.util.ArrayList;
@@ -30,18 +30,21 @@ public class HomeActivity extends AppCompatActivity {
     private ImageButton listsButton;
     private ImageButton notificationsButton;
     private TMDBRepository tmdbRepository;
-    private ProgressBar loadingProgressBar;
+    private ReelMateRepository repository;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Initialize TMDB Repository
         tmdbRepository = new TMDBRepository();
+        repository = new ReelMateRepository(this);
+        sessionManager = new SessionManager(this);
 
         initializeViews();
         setupRecyclerView();
+        observeWatchlistCount();
         loadMoviesFromTMDB();
     }
 
@@ -52,30 +55,21 @@ public class HomeActivity extends AppCompatActivity {
         listsButton = findViewById(R.id.listsButton);
         notificationsButton = findViewById(R.id.notificationsButton);
 
-        profileButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
-            }
-        });
-
-        listsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, MyListsActivity.class));
-            }
-        });
-
-        notificationsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, NotificationsActivity.class));
-            }
-        });
+        profileButton.setOnClickListener(v ->
+            startActivity(new Intent(HomeActivity.this, ProfileActivity.class))
+        );
+        listsButton.setOnClickListener(v ->
+            startActivity(new Intent(HomeActivity.this, MyListsActivity.class))
+        );
+        notificationsButton.setOnClickListener(v ->
+            startActivity(new Intent(HomeActivity.this, NotificationsActivity.class))
+        );
     }
 
     private void setupRecyclerView() {
         movieList = new ArrayList<>();
+        int userId = sessionManager.getUserId();
+
         movieAdapter = new MovieAdapter(this, movieList, new MovieAdapter.OnMovieClickListener() {
             @Override
             public void onMovieClick(Movie movie) {
@@ -86,15 +80,27 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onWatchlistClick(Movie movie) {
-                movie.setInWatchlist(!movie.isInWatchlist());
-                movieAdapter.notifyDataSetChanged();
-                updateWatchlistCount();
+                if (movie.isInWatchlist()) {
+                    repository.removeFromWatchlist(userId, movie.getId(), success -> {
+                        movie.setInWatchlist(false);
+                        movieAdapter.notifyDataSetChanged();
+                    });
+                } else {
+                    repository.addToWatchlist(userId, movie.getId(), movie.getTitle(),
+                        movie.getPoster(), movie.getYear(), movie.getRating(), success -> {
+                            movie.setInWatchlist(true);
+                            movieAdapter.notifyDataSetChanged();
+                        });
+                }
             }
 
             @Override
             public void onWatchedClick(Movie movie) {
-                movie.setWatched(!movie.isWatched());
-                movieAdapter.notifyDataSetChanged();
+                boolean newState = !movie.isWatched();
+                repository.setMovieWatched(userId, movie.getId(), newState, success -> {
+                    movie.setWatched(newState);
+                    movieAdapter.notifyDataSetChanged();
+                });
             }
         });
 
@@ -102,60 +108,56 @@ public class HomeActivity extends AppCompatActivity {
         moviesRecyclerView.setAdapter(movieAdapter);
     }
 
+    private void observeWatchlistCount() {
+        int userId = sessionManager.getUserId();
+        repository.getWatchlistCount(userId).observe(this, count -> {
+            int c = count != null ? count : 0;
+            watchlistCountTextView.setText(getString(R.string.movies_in_watchlist, c));
+        });
+    }
+
     private void loadMoviesFromTMDB() {
-        // Show loading indicator
         Toast.makeText(this, "Loading movies from TMDB...", Toast.LENGTH_SHORT).show();
 
-        // Fetch real TMDB data
         tmdbRepository.getPopularMovies(1, new TMDBRepository.RepositoryCallback<List<Movie>>() {
             @Override
             public void onSuccess(List<Movie> movies) {
                 movieList.clear();
                 movieList.addAll(movies);
+                // Sync watchlist state from DB
+                syncWatchlistState();
                 movieAdapter.notifyDataSetChanged();
-                updateWatchlistCount();
-                Toast.makeText(HomeActivity.this,
-                    "Loaded " + movies.size() + " movies from TMDB",
-                    Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(String errorMessage) {
                 Toast.makeText(HomeActivity.this,
-                    "Error loading movies: " + errorMessage,
-                    Toast.LENGTH_LONG).show();
-
-                // Fallback to demo data if API fails
+                    "Error loading movies: " + errorMessage, Toast.LENGTH_LONG).show();
                 loadDemoMovies();
             }
         });
     }
 
+    private void syncWatchlistState() {
+        int userId = sessionManager.getUserId();
+        for (Movie movie : movieList) {
+            repository.isInWatchlist(userId, movie.getId(), isIn ->
+                movie.setInWatchlist(isIn)
+            );
+        }
+        movieAdapter.notifyDataSetChanged();
+    }
+
     private void loadDemoMovies() {
         movieList.clear();
         movieList.addAll(DataProvider.getMovies());
+        syncWatchlistState();
         movieAdapter.notifyDataSetChanged();
-        updateWatchlistCount();
-    }
-
-    private void loadMovies() {
-        // Legacy method - kept for compatibility
-        loadDemoMovies();
-    }
-
-    private void updateWatchlistCount() {
-        int count = 0;
-        for (Movie movie : movieList) {
-            if (movie.isInWatchlist()) {
-                count++;
-            }
-        }
-        watchlistCountTextView.setText(getString(R.string.movies_in_watchlist, count));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateWatchlistCount();
+        syncWatchlistState();
     }
 }
