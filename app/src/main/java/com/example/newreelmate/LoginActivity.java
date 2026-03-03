@@ -6,8 +6,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.newreelmate.database.ReelMateRepository;
+import com.example.newreelmate.database.SessionManager;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -20,10 +24,23 @@ public class LoginActivity extends AppCompatActivity {
     private TextView titleTextView;
     private boolean isLoginMode = true;
 
+    private ReelMateRepository repository;
+    private SessionManager sessionManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        repository = new ReelMateRepository(this);
+        sessionManager = new SessionManager(this);
+
+        // If already logged in, go straight to Home
+        if (sessionManager.isLoggedIn()) {
+            startActivity(new Intent(this, HomeActivity.class));
+            finish();
+            return;
+        }
 
         initializeViews();
         setupListeners();
@@ -40,41 +57,55 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                handleAuth();
-            }
-        });
+        loginButton.setOnClickListener(v -> handleAuth());
 
-        toggleAuthTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleAuthMode();
-            }
-        });
+        toggleAuthTextView.setOnClickListener(v -> toggleAuthMode());
 
-        forgotPasswordTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class));
-            }
-        });
+        forgotPasswordTextView.setOnClickListener(v ->
+            startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class))
+        );
     }
 
     private void handleAuth() {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
-        // Basic validation
         if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Navigate to Home Screen
-        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-        startActivity(intent);
-        finish();
+        loginButton.setEnabled(false);
+
+        if (isLoginMode) {
+            repository.loginUser(email, password, user -> {
+                loginButton.setEnabled(true);
+                if (user != null) {
+                    sessionManager.saveSession(user.id, user.name, user.email);
+                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                    finish();
+                } else {
+                    Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            // Register mode — need name field too; use email prefix as name if not available
+            String name = email.split("@")[0];
+            if (password.length() < 6) {
+                loginButton.setEnabled(true);
+                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            repository.registerUser(name, email, password, success -> {
+                loginButton.setEnabled(true);
+                if (success) {
+                    Toast.makeText(this, "Account created! Please login.", Toast.LENGTH_SHORT).show();
+                    toggleAuthMode();
+                } else {
+                    Toast.makeText(this, "Email already registered", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void toggleAuthMode() {

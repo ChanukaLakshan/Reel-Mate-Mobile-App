@@ -15,11 +15,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.newreelmate.adapters.MovieListAdapter;
-import com.example.newreelmate.data.DataProvider;
+import com.example.newreelmate.database.ReelMateRepository;
+import com.example.newreelmate.database.SessionManager;
+import com.example.newreelmate.database.entities.MovieListEntity;
 import com.example.newreelmate.models.MovieList;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MyListsActivity extends AppCompatActivity {
 
@@ -27,11 +32,16 @@ public class MyListsActivity extends AppCompatActivity {
     private MovieListAdapter listAdapter;
     private List<MovieList> lists;
     private ActivityResultLauncher<Intent> createListLauncher;
+    private ReelMateRepository repository;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_lists);
+
+        repository = new ReelMateRepository(this);
+        sessionManager = new SessionManager(this);
 
         createListLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -42,16 +52,11 @@ public class MyListsActivity extends AppCompatActivity {
                         String name = result.getData().getStringExtra("LIST_NAME");
                         String description = result.getData().getStringExtra("LIST_DESCRIPTION");
                         if (name != null && !name.trim().isEmpty()) {
-                            MovieList newList = new MovieList(
-                                lists.size() + 1,
-                                name.trim(),
+                            int userId = sessionManager.getUserId();
+                            repository.createMovieList(userId, name.trim(),
                                 description == null ? "" : description.trim(),
-                                0,
-                                "Just now",
-                                new java.util.ArrayList<String>()
+                                id -> loadListsFromDb()
                             );
-                            lists.add(0, newList);
-                            listAdapter.notifyDataSetChanged();
                         }
                     }
                 }
@@ -60,37 +65,32 @@ public class MyListsActivity extends AppCompatActivity {
 
         initializeViews();
         setupRecyclerView();
-        loadLists();
+        loadListsFromDb();
     }
 
     private void initializeViews() {
         listsRecyclerView = findViewById(R.id.listsRecyclerView);
 
         ImageButton backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(v -> finish());
 
-        findViewById(R.id.createListButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createListLauncher.launch(new Intent(MyListsActivity.this, CreateListActivity.class));
-            }
-        });
+        View createListButton = findViewById(R.id.createListButton);
+        if (createListButton != null) {
+            createListButton.setOnClickListener(v ->
+                createListLauncher.launch(new Intent(MyListsActivity.this, CreateListActivity.class))
+            );
+        }
 
-        findViewById(R.id.createNewListButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createListLauncher.launch(new Intent(MyListsActivity.this, CreateListActivity.class));
-            }
-        });
+        View createNewListButton = findViewById(R.id.createNewListButton);
+        if (createNewListButton != null) {
+            createNewListButton.setOnClickListener(v ->
+                createListLauncher.launch(new Intent(MyListsActivity.this, CreateListActivity.class))
+            );
+        }
     }
 
     private void setupRecyclerView() {
-        lists = new ArrayList<>(DataProvider.getMovieLists());
+        lists = new ArrayList<>();
         listAdapter = new MovieListAdapter(this, lists,
             new MovieListAdapter.OnListClickListener() {
                 @Override
@@ -102,9 +102,11 @@ public class MyListsActivity extends AppCompatActivity {
 
                 @Override
                 public void onDeleteClick(MovieList movieList) {
-                    lists.remove(movieList);
-                    listAdapter.notifyDataSetChanged();
-                    Toast.makeText(MyListsActivity.this, "List deleted", Toast.LENGTH_SHORT).show();
+                    int userId = sessionManager.getUserId();
+                    repository.deleteMovieList(movieList.getId(), userId, success -> {
+                        loadListsFromDb();
+                        Toast.makeText(MyListsActivity.this, "List deleted", Toast.LENGTH_SHORT).show();
+                    });
                 }
 
                 @Override
@@ -121,7 +123,26 @@ public class MyListsActivity extends AppCompatActivity {
         listsRecyclerView.setAdapter(listAdapter);
     }
 
-    private void loadLists() {
-        // Lists are loaded in the adapter constructor
+    private void loadListsFromDb() {
+        int userId = sessionManager.getUserId();
+        repository.getMovieLists(userId).observe(this, entityList -> {
+            lists.clear();
+            if (entityList != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
+                for (MovieListEntity entity : entityList) {
+                    String dateStr = sdf.format(new Date(entity.createdAt));
+                    MovieList ml = new MovieList(
+                        entity.id,
+                        entity.name,
+                        entity.description,
+                        0,
+                        dateStr,
+                        new ArrayList<>()
+                    );
+                    lists.add(ml);
+                }
+            }
+            listAdapter.notifyDataSetChanged();
+        });
     }
 }
