@@ -3,7 +3,6 @@ package com.example.newreelmate;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
@@ -31,8 +30,6 @@ public class ProfileActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         repository = new ReelMateRepository(this);
 
-        ImageButton backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(v -> finish());
 
         userNameTextView = findViewById(R.id.userNameTextView);
         userEmailTextView = findViewById(R.id.userEmailTextView);
@@ -82,6 +79,8 @@ public class ProfileActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
+
+        BottomNavHelper.setup(this, R.id.nav_profile);
     }
 
     private void loadUserProfile() {
