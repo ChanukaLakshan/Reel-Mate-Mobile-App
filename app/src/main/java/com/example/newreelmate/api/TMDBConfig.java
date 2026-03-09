@@ -1,22 +1,21 @@
 package com.example.newreelmate.api;
 
 /**
- * TMDB API Configuration - Store your API key here
- * Get your API key from: https://www.themoviedb.org/settings/api
+ * TMDB API Configuration
  */
 public class TMDBConfig {
-    /**
-     * IMPORTANT: Replace this with your actual TMDB API key
-     * 1. Go to https://www.themoviedb.org/settings/api
-     * 2. Create an account if you don't have one
-     * 3. Request an API key (v3 Auth)
-     * 4. Copy the API key and paste it below
-     */
-    public static final String TMDB_API_KEY = "YOUR_TMDB_API_KEY_HERE";
+
+    // TMDB API Key (v3 Auth)
+    public static final String TMDB_API_KEY = "768a21476e016e4cef1c35cbea20f449";
+
+    // TMDB API Read Access Token (v4 Bearer Auth)
+    public static final String TMDB_READ_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3NjhhMjE0NzZlMDE2ZTRjZWYxYzM1Y2JlYTIwZjQ0OSIsIm5iZiI6MTc3MzA4NjE1MC43OTMsInN1YiI6IjY5YWYyNWM2MWIyNTU2ODAwMjRlYjZiOSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.SuUcd46I_OnY7pH8K1Mc50leNsqWUTr4f9NX3MhF_fc";
 
     // Image URL base paths
     public static final String POSTER_URL_PREFIX = "https://image.tmdb.org/t/p/w500";
     public static final String BACKDROP_URL_PREFIX = "https://image.tmdb.org/t/p/w1280";
     public static final String PROFILE_URL_PREFIX = "https://image.tmdb.org/t/p/w185";
 }
+
+
 

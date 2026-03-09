@@ -29,7 +29,7 @@ public class TMDBRepository {
      * @param callback Callback to handle response
      */
     public void getPopularMovies(int page, final RepositoryCallback<List<Movie>> callback) {
-        Call<TMDBMovieResponse> call = apiService.getPopularMovies(TMDBConfig.TMDB_API_KEY, page);
+        Call<TMDBMovieResponse> call = apiService.getPopularMovies(page);
 
         call.enqueue(new Callback<TMDBMovieResponse>() {
             @Override
@@ -58,7 +58,7 @@ public class TMDBRepository {
      * @param callback Callback to handle response
      */
     public void getTopRatedMovies(int page, final RepositoryCallback<List<Movie>> callback) {
-        Call<TMDBMovieResponse> call = apiService.getTopRatedMovies(TMDBConfig.TMDB_API_KEY, page);
+        Call<TMDBMovieResponse> call = apiService.getTopRatedMovies(page);
 
         call.enqueue(new Callback<TMDBMovieResponse>() {
             @Override
@@ -87,7 +87,7 @@ public class TMDBRepository {
      * @param callback Callback to handle response
      */
     public void getUpcomingMovies(int page, final RepositoryCallback<List<Movie>> callback) {
-        Call<TMDBMovieResponse> call = apiService.getUpcomingMovies(TMDBConfig.TMDB_API_KEY, page);
+        Call<TMDBMovieResponse> call = apiService.getUpcomingMovies(page);
 
         call.enqueue(new Callback<TMDBMovieResponse>() {
             @Override
@@ -117,7 +117,7 @@ public class TMDBRepository {
      * @param callback Callback to handle response
      */
     public void searchMovies(String query, int page, final RepositoryCallback<List<Movie>> callback) {
-        Call<TMDBMovieResponse> call = apiService.searchMovies(TMDBConfig.TMDB_API_KEY, query, page);
+        Call<TMDBMovieResponse> call = apiService.searchMovies(query, page);
 
         call.enqueue(new Callback<TMDBMovieResponse>() {
             @Override
@@ -148,7 +148,6 @@ public class TMDBRepository {
     public void getMovieDetails(int movieId, final RepositoryCallback<Movie> callback) {
         Call<TMDBMovieDetailsResponse> call = apiService.getMovieDetails(
                 movieId,
-                TMDBConfig.TMDB_API_KEY,
                 "credits,videos"
         );
 
