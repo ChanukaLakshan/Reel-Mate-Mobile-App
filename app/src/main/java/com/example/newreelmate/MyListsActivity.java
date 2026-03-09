@@ -3,7 +3,6 @@ package com.example.newreelmate;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -66,13 +65,12 @@ public class MyListsActivity extends AppCompatActivity {
         initializeViews();
         setupRecyclerView();
         loadListsFromDb();
+        BottomNavHelper.setup(this, R.id.nav_lists);
     }
 
     private void initializeViews() {
         listsRecyclerView = findViewById(R.id.listsRecyclerView);
 
-        ImageButton backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(v -> finish());
 
         View createListButton = findViewById(R.id.createListButton);
         if (createListButton != null) {

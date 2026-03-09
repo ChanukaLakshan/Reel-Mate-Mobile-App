@@ -78,4 +78,10 @@
 
     <string name="reset_email">Email address</string>
     <string name="send_reset_link">Send reset link</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_lists">Lists</string>
+    <string name="nav_notifications">Alerts</string>
+    <string name="nav_profile">Profile</string>
 </resources>

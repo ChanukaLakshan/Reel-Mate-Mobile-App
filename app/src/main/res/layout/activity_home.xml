@@ -27,35 +27,6 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <ImageButton
-            android:id="@+id/listsButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/my_lists"
-            android:src="@android:drawable/ic_menu_sort_by_size"
-            app:tint="@color/text_primary" />
-
-        <ImageButton
-            android:id="@+id/notificationsButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Notifications"
-            android:src="@android:drawable/ic_popup_reminder"
-            app:tint="@color/text_primary" />
-
-        <ImageButton
-            android:id="@+id/profileButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/profile"
-            android:src="@android:drawable/ic_menu_myplaces"
-            app:tint="@color/text_primary" />
-
     </LinearLayout>
 
     <!-- Search Bar -->
@@ -73,6 +44,8 @@
             android:drawableStart="@android:drawable/ic_menu_search"
             android:drawablePadding="12dp"
             android:hint="@string/search_movies"
+            android:inputType="text"
+            android:importantForAutofill="no"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:textColor="@color/text_primary"
@@ -118,7 +91,23 @@
         android:clipToPadding="false"
         android:padding="16dp" />
 
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/border_color" />
+
+    <!-- Bottom Navigation Bar -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_secondary"
+        android:elevation="8dp"
+        app:itemIconTint="@color/bottom_nav_item_color"
+        app:itemTextColor="@color/bottom_nav_item_color"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
+
 </LinearLayout>
-
-
 

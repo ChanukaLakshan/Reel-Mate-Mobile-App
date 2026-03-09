@@ -2,7 +2,6 @@ package com.example.newreelmate;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,9 +25,6 @@ public class HomeActivity extends AppCompatActivity {
     private MovieAdapter movieAdapter;
     private List<Movie> movieList;
     private TextView watchlistCountTextView;
-    private ImageButton profileButton;
-    private ImageButton listsButton;
-    private ImageButton notificationsButton;
     private TMDBRepository tmdbRepository;
     private ReelMateRepository repository;
     private SessionManager sessionManager;
@@ -46,24 +42,12 @@ public class HomeActivity extends AppCompatActivity {
         setupRecyclerView();
         observeWatchlistCount();
         loadMoviesFromTMDB();
+        BottomNavHelper.setup(this, R.id.nav_home);
     }
 
     private void initializeViews() {
         moviesRecyclerView = findViewById(R.id.moviesRecyclerView);
         watchlistCountTextView = findViewById(R.id.watchlistCountTextView);
-        profileButton = findViewById(R.id.profileButton);
-        listsButton = findViewById(R.id.listsButton);
-        notificationsButton = findViewById(R.id.notificationsButton);
-
-        profileButton.setOnClickListener(v ->
-            startActivity(new Intent(HomeActivity.this, ProfileActivity.class))
-        );
-        listsButton.setOnClickListener(v ->
-            startActivity(new Intent(HomeActivity.this, MyListsActivity.class))
-        );
-        notificationsButton.setOnClickListener(v ->
-            startActivity(new Intent(HomeActivity.this, NotificationsActivity.class))
-        );
     }
 
     private void setupRecyclerView() {
