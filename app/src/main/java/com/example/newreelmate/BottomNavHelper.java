@@ -19,46 +19,52 @@ public class BottomNavHelper {
         bottomNav.setItemActiveIndicatorColor(
                 ColorStateList.valueOf(activity.getColor(R.color.background_tertiary)));
 
-        // Set the currently selected tab
-        bottomNav.setSelectedItemId(selectedItemId);
+        // Suppress tap on already-selected tab (no re-launch)
+        bottomNav.setOnItemReselectedListener(item -> { /* do nothing */ });
 
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
+        // 2. Set the selected item AFTER the listener is attached,
+        //    using post() so it runs after the current layout pass —
+        //    this prevents the listener from being triggered by setSelectedItemId itself.
+        bottomNav.post(() -> {
+            // Temporarily remove listener so setSelectedItemId doesn't fire navigation
+            bottomNav.setOnItemSelectedListener(null);
+            bottomNav.setSelectedItemId(selectedItemId);
 
-            if (id == R.id.nav_home) {
-                if (!(activity instanceof HomeActivity)) {
-                    Intent intent = new Intent(activity, HomeActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    activity.startActivity(intent);
-                    activity.overridePendingTransition(0, 0);
+            // Now attach the real listener for user taps
+            bottomNav.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.nav_home) {
+                    if (!(activity instanceof HomeActivity)) {
+                        navigate(activity, HomeActivity.class);
+                    }
+                    return true;
+                } else if (id == R.id.nav_lists) {
+                    if (!(activity instanceof MyListsActivity)) {
+                        navigate(activity, MyListsActivity.class);
+                    }
+                    return true;
+                } else if (id == R.id.nav_notifications) {
+                    if (!(activity instanceof NotificationsActivity)) {
+                        navigate(activity, NotificationsActivity.class);
+                    }
+                    return true;
+                } else if (id == R.id.nav_profile) {
+                    if (!(activity instanceof ProfileActivity)) {
+                        navigate(activity, ProfileActivity.class);
+                    }
+                    return true;
                 }
-                return true;
-            } else if (id == R.id.nav_lists) {
-                if (!(activity instanceof MyListsActivity)) {
-                    Intent intent = new Intent(activity, MyListsActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    activity.startActivity(intent);
-                    activity.overridePendingTransition(0, 0);
-                }
-                return true;
-            } else if (id == R.id.nav_notifications) {
-                if (!(activity instanceof NotificationsActivity)) {
-                    Intent intent = new Intent(activity, NotificationsActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    activity.startActivity(intent);
-                    activity.overridePendingTransition(0, 0);
-                }
-                return true;
-            } else if (id == R.id.nav_profile) {
-                if (!(activity instanceof ProfileActivity)) {
-                    Intent intent = new Intent(activity, ProfileActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                    activity.startActivity(intent);
-                    activity.overridePendingTransition(0, 0);
-                }
-                return true;
-            }
-            return false;
+                return false;
+            });
+
+            bottomNav.setOnItemReselectedListener(item -> { /* do nothing */ });
         });
+    }
+
+    private static void navigate(Activity from, Class<?> to) {
+        Intent intent = new Intent(from, to);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        from.startActivity(intent);
+        from.overridePendingTransition(0, 0);
     }
 }

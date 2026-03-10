@@ -78,6 +78,12 @@ public class MyListsActivity extends AppCompatActivity {
         BottomNavHelper.setup(this, R.id.nav_lists);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BottomNavHelper.setup(this, R.id.nav_lists);
+    }
+
     private void initializeViews() {
         watchlistRecyclerView    = findViewById(R.id.watchlistRecyclerView);
         watchlistCountTextView   = findViewById(R.id.watchlistCountTextView);

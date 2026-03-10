@@ -180,5 +180,6 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         syncWatchlistState();
+        BottomNavHelper.setup(this, R.id.nav_home);
     }
 }
