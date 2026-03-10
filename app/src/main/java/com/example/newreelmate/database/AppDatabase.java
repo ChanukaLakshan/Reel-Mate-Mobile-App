@@ -5,6 +5,9 @@ import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.newreelmate.database.dao.MovieListDao;
 import com.example.newreelmate.database.dao.MovieListItemDao;
@@ -25,9 +28,10 @@ import com.example.newreelmate.database.entities.WatchlistEntity;
         MovieListItemEntity.class,
         ReviewEntity.class
     },
-    version = 1,
+    version = 2,
     exportSchema = false
 )
+@TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
@@ -38,6 +42,14 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract MovieListItemDao movieListItemDao();
     public abstract ReviewDao reviewDao();
 
+    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            // Room expects favoriteGenres as nullable TEXT with no default
+            database.execSQL("ALTER TABLE users ADD COLUMN favoriteGenres TEXT");
+        }
+    };
+
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
@@ -46,7 +58,10 @@ public abstract class AppDatabase extends RoomDatabase {
                             context.getApplicationContext(),
                             AppDatabase.class,
                             "reelmate_db"
-                    ).build();
+                    )
+                    .addMigrations(MIGRATION_1_2)
+                    .fallbackToDestructiveMigration()
+                    .build();
                 }
             }
         }

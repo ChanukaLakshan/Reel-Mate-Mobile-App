@@ -96,11 +96,16 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
                 return;
             }
-            repository.registerUser(name, email, password, success -> {
+            repository.registerUserAndGetId(name, email, password, userId -> {
                 loginButton.setEnabled(true);
-                if (success) {
-                    Toast.makeText(this, "Account created! Please login.", Toast.LENGTH_SHORT).show();
-                    toggleAuthMode();
+                if (userId != null && userId > 0) {
+                    // Save session immediately
+                    sessionManager.saveSession(userId, name, email);
+                    // Navigate to genre selection
+                    Intent intent = new Intent(LoginActivity.this, GenreSelectionActivity.class);
+                    intent.putExtra(GenreSelectionActivity.EXTRA_USER_ID, userId);
+                    startActivity(intent);
+                    finish();
                 } else {
                     Toast.makeText(this, "Email already registered", Toast.LENGTH_SHORT).show();
                 }

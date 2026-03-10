@@ -6,6 +6,7 @@ import android.os.Looper;
 
 import androidx.lifecycle.LiveData;
 
+import com.example.newreelmate.database.Converters;
 import com.example.newreelmate.database.dao.MovieListDao;
 import com.example.newreelmate.database.dao.MovieListItemDao;
 import com.example.newreelmate.database.dao.ReviewDao;
@@ -225,6 +226,47 @@ public class ReelMateRepository {
         executor.execute(() -> {
             ReviewEntity review = reviewDao.getReviewByUserAndMovie(userId, movieId);
             mainHandler.post(() -> callback.onResult(review));
+        });
+    }
+
+    // ─── FAVORITE GENRES ──────────────────────────────────────────────────────
+
+    public void saveFavoriteGenres(int userId, List<String> genres, Callback<Boolean> callback) {
+        executor.execute(() -> {
+            try {
+                String genresStr = Converters.fromList(genres);
+                userDao.updateFavoriteGenres(userId, genresStr);
+                mainHandler.post(() -> callback.onResult(true));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onResult(false));
+            }
+        });
+    }
+
+    public void getFavoriteGenres(int userId, Callback<List<String>> callback) {
+        executor.execute(() -> {
+            UserEntity user = userDao.getUserById(userId);
+            List<String> genres = (user != null && user.favoriteGenres != null)
+                    ? user.favoriteGenres : new java.util.ArrayList<>();
+            mainHandler.post(() -> callback.onResult(genres));
+        });
+    }
+
+    public void registerUserAndGetId(String name, String email, String password, Callback<Integer> callback) {
+        executor.execute(() -> {
+            try {
+                if (userDao.emailExists(email) > 0) {
+                    mainHandler.post(() -> callback.onResult(-1));
+                    return;
+                }
+                userDao.insertUser(new UserEntity(name, email, password));
+                // Fetch the inserted user to get the auto-generated id
+                UserEntity inserted = userDao.getUserByEmail(email);
+                int id = (inserted != null) ? inserted.id : -1;
+                mainHandler.post(() -> callback.onResult(id));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onResult(-1));
+            }
         });
     }
 }

@@ -60,6 +60,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         Button editProfileButton = findViewById(R.id.editProfileButton);
         Button settingsButton = findViewById(R.id.settingsButton);
+        Button changeGenresButton = findViewById(R.id.changeGenresButton);
         Button logoutButton = findViewById(R.id.logoutButton);
 
         editProfileButton.setOnClickListener(v -> {
@@ -72,6 +73,20 @@ public class ProfileActivity extends AppCompatActivity {
         settingsButton.setOnClickListener(v ->
             startActivity(new Intent(ProfileActivity.this, SettingsActivity.class))
         );
+
+        changeGenresButton.setOnClickListener(v -> {
+            int userId = sessionManager.getUserId();
+            repository.getFavoriteGenres(userId, genres -> {
+                Intent intent = new Intent(ProfileActivity.this, GenreSelectionActivity.class);
+                intent.putExtra(GenreSelectionActivity.EXTRA_USER_ID, userId);
+                if (genres != null && !genres.isEmpty()) {
+                    intent.putStringArrayListExtra(
+                        GenreSelectionActivity.EXTRA_EXISTING_GENRES,
+                        new java.util.ArrayList<>(genres));
+                }
+                startActivity(intent);
+            });
+        });
 
         logoutButton.setOnClickListener(v -> {
             sessionManager.clearSession();
