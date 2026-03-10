@@ -23,14 +23,16 @@ public class ReviewEntity {
     public int id;
 
     public int userId;
+    public String userName;
     public int movieId;
     public String movieTitle;
     public float rating;
     public String comment;
     public long createdAt;
 
-    public ReviewEntity(int userId, int movieId, String movieTitle, float rating, String comment) {
+    public ReviewEntity(int userId, String userName, int movieId, String movieTitle, float rating, String comment) {
         this.userId = userId;
+        this.userName = userName;
         this.movieId = movieId;
         this.movieTitle = movieTitle;
         this.rating = rating;

@@ -28,7 +28,7 @@ import com.example.newreelmate.database.entities.WatchlistEntity;
         MovieListItemEntity.class,
         ReviewEntity.class
     },
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters.class)
@@ -45,8 +45,14 @@ public abstract class AppDatabase extends RoomDatabase {
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            // Room expects favoriteGenres as nullable TEXT with no default
             database.execSQL("ALTER TABLE users ADD COLUMN favoriteGenres TEXT");
+        }
+    };
+
+    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE reviews ADD COLUMN userName TEXT");
         }
     };
 
@@ -59,7 +65,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class,
                             "reelmate_db"
                     )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .fallbackToDestructiveMigration()
                     .build();
                 }
