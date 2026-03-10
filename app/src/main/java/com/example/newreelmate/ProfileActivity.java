@@ -98,6 +98,12 @@ public class ProfileActivity extends AppCompatActivity {
         BottomNavHelper.setup(this, R.id.nav_profile);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BottomNavHelper.setup(this, R.id.nav_profile);
+    }
+
     private void loadUserProfile() {
         int userId = sessionManager.getUserId();
         if (userId != -1) {

@@ -201,11 +201,11 @@ public class ReelMateRepository {
 
     // ─── REVIEWS ─────────────────────────────────────────────────────────────
 
-    public void submitReview(int userId, int movieId, String movieTitle,
+    public void submitReview(int userId, String userName, int movieId, String movieTitle,
                              float rating, String comment, Callback<Boolean> callback) {
         executor.execute(() -> {
             try {
-                ReviewEntity review = new ReviewEntity(userId, movieId, movieTitle, rating, comment);
+                ReviewEntity review = new ReviewEntity(userId, userName, movieId, movieTitle, rating, comment);
                 reviewDao.insertReview(review);
                 mainHandler.post(() -> callback.onResult(true));
             } catch (Exception e) {

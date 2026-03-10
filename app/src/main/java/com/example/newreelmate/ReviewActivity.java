@@ -83,7 +83,8 @@ public class ReviewActivity extends AppCompatActivity {
 
         submitButton.setEnabled(false);
 
-        repository.submitReview(userId, movieId, movieTitle, rating, reviewText, success -> {
+        String userName = sessionManager.getUserName();
+        repository.submitReview(userId, userName, movieId, movieTitle, rating, reviewText, success -> {
             submitButton.setEnabled(true);
             if (success) {
                 Toast.makeText(this, "Review submitted successfully!", Toast.LENGTH_SHORT).show();

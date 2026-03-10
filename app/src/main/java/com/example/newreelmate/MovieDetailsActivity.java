@@ -181,9 +181,11 @@ public class MovieDetailsActivity extends AppCompatActivity {
             reviews.clear();
             if (reviewEntities != null) {
                 for (com.example.newreelmate.database.entities.ReviewEntity re : reviewEntities) {
+                    String displayName = (re.userName != null && !re.userName.isEmpty())
+                            ? re.userName : "User " + re.userId;
                     reviews.add(new Review(
                             re.id,
-                            "User " + re.userId,   // userName
+                            displayName,            // real user name
                             "",                     // userAvatar
                             (int) re.rating,        // rating
                             re.comment,             // comment

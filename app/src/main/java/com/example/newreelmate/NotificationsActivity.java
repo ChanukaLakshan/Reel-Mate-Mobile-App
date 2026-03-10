@@ -12,4 +12,10 @@ public class NotificationsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notifications);
         BottomNavHelper.setup(this, R.id.nav_notifications);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BottomNavHelper.setup(this, R.id.nav_notifications);
+    }
 }
