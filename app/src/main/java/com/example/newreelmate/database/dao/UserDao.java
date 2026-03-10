@@ -35,5 +35,7 @@ public interface UserDao {
 
     @Query("UPDATE users SET password = :newPassword WHERE email = :email")
     void updatePassword(String email, String newPassword);
-}
 
+    @Query("UPDATE users SET favoriteGenres = :favoriteGenres WHERE id = :id")
+    void updateFavoriteGenres(int id, String favoriteGenres);
+}

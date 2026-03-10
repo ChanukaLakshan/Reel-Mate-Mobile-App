@@ -74,6 +74,26 @@
             android:text="@string/auto_play_trailers"
             android:textColor="@color/text_secondary" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/manage_genres"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/manageGenresButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/button_secondary"
+            android:text="@string/change_genres"
+            android:textAllCaps="false"
+            android:textColor="@color/primary_yellow"
+            android:textSize="15sp" />
+
     </LinearLayout>
 
 </LinearLayout>

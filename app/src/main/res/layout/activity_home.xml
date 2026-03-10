@@ -64,9 +64,10 @@
         android:paddingBottom="8dp">
 
         <TextView
+            android:id="@+id/sectionTitleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/my_watchlist"
+            android:text="@string/popular_movies"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />

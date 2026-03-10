@@ -264,5 +264,40 @@ public class TMDBRepository {
         void onSuccess(T data);
         void onError(String errorMessage);
     }
+
+    /**
+     * Discover movies by a list of TMDB genre IDs (pipe-separated OR logic)
+     */
+    public void getMoviesByGenreIds(List<Integer> genreIds, int page, final RepositoryCallback<List<Movie>> callback) {
+        if (genreIds == null || genreIds.isEmpty()) {
+            getPopularMovies(page, callback);
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < genreIds.size(); i++) {
+            sb.append(genreIds.get(i));
+            if (i < genreIds.size() - 1) sb.append("|");
+        }
+        Call<TMDBMovieResponse> call = apiService.discoverMoviesByGenres(sb.toString(), page, "popularity.desc");
+        call.enqueue(new Callback<TMDBMovieResponse>() {
+            @Override
+            public void onResponse(Call<TMDBMovieResponse> call, Response<TMDBMovieResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Movie> movies = convertTMDBMoviesToMovies(response.body().getResults());
+                    callback.onSuccess(movies);
+                    Log.d(TAG, "Genre-based movies fetched: " + movies.size());
+                } else {
+                    callback.onError("Failed to fetch genre movies: " + response.code());
+                    Log.e(TAG, "Genre discover error: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TMDBMovieResponse> call, Throwable t) {
+                callback.onError("Network error: " + t.getMessage());
+                Log.e(TAG, "Network error", t);
+            }
+        });
+    }
 }
 

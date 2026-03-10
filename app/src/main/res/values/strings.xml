@@ -84,4 +84,15 @@
     <string name="nav_lists">Lists</string>
     <string name="nav_notifications">Alerts</string>
     <string name="nav_profile">Profile</string>
+
+    <!-- Genre Selection -->
+    <string name="genre_selection_title">What do you love watching?</string>
+    <string name="genre_selection_subtitle">Select at least 3 genres to personalise your recommendations</string>
+    <string name="genre_selection_skip">Skip</string>
+    <string name="genre_selection_continue">Continue</string>
+    <string name="genre_selection_min_hint">0 selected (min 3)</string>
+    <string name="change_genres">Change Genres</string>
+    <string name="personalized_for_you">Picked For You</string>
+    <string name="popular_movies">Popular Movies</string>
+    <string name="manage_genres">Manage Favourite Genres</string>
 </resources>

@@ -1,12 +1,17 @@
 package com.example.newreelmate;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+
+import com.example.newreelmate.database.ReelMateRepository;
+import com.example.newreelmate.database.SessionManager;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -16,14 +21,20 @@ public class SettingsActivity extends AppCompatActivity {
 
     private SwitchCompat notificationsSwitch;
     private SwitchCompat autoPlaySwitch;
+    private ReelMateRepository repository;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        repository = new ReelMateRepository(this);
+        sessionManager = new SessionManager(this);
+
         notificationsSwitch = findViewById(R.id.notificationsSwitch);
         autoPlaySwitch = findViewById(R.id.autoPlaySwitch);
+        Button manageGenresButton = findViewById(R.id.manageGenresButton);
 
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -43,6 +54,20 @@ public class SettingsActivity extends AppCompatActivity {
         autoPlaySwitch.setOnCheckedChangeListener((buttonView, isChecked) ->
             prefs.edit().putBoolean(KEY_AUTO_PLAY, isChecked).apply()
         );
+
+        manageGenresButton.setOnClickListener(v -> {
+            int userId = sessionManager.getUserId();
+            repository.getFavoriteGenres(userId, genres -> {
+                Intent intent = new Intent(SettingsActivity.this, GenreSelectionActivity.class);
+                intent.putExtra(GenreSelectionActivity.EXTRA_USER_ID, userId);
+                if (genres != null && !genres.isEmpty()) {
+                    intent.putStringArrayListExtra(
+                        GenreSelectionActivity.EXTRA_EXISTING_GENRES,
+                        new java.util.ArrayList<>(genres));
+                }
+                startActivity(intent);
+            });
+        });
     }
 }
 

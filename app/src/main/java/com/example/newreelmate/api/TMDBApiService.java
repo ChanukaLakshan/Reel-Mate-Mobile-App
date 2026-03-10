@@ -70,4 +70,18 @@ public interface TMDBApiService {
      */
     @GET("genre/movie/list")
     Call<TMDBGenreResponse> getGenres();
+
+    /**
+     * Discover movies by genre IDs
+     * @param genreIds Pipe-separated genre IDs (e.g. "28|35")
+     * @param page Page number
+     * @param sortBy Sort order (e.g. "popularity.desc")
+     * @return Call with TMDBMovieResponse
+     */
+    @GET("discover/movie")
+    Call<TMDBMovieResponse> discoverMoviesByGenres(
+            @Query("with_genres") String genreIds,
+            @Query("page") int page,
+            @Query("sort_by") String sortBy
+    );
 }

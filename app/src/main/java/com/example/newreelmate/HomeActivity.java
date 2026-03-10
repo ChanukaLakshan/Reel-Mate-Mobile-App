@@ -25,6 +25,7 @@ public class HomeActivity extends AppCompatActivity {
     private MovieAdapter movieAdapter;
     private List<Movie> movieList;
     private TextView watchlistCountTextView;
+    private TextView sectionTitleTextView;
     private TMDBRepository tmdbRepository;
     private ReelMateRepository repository;
     private SessionManager sessionManager;
@@ -41,13 +42,14 @@ public class HomeActivity extends AppCompatActivity {
         initializeViews();
         setupRecyclerView();
         observeWatchlistCount();
-        loadMoviesFromTMDB();
+        loadMoviesForUser();
         BottomNavHelper.setup(this, R.id.nav_home);
     }
 
     private void initializeViews() {
         moviesRecyclerView = findViewById(R.id.moviesRecyclerView);
         watchlistCountTextView = findViewById(R.id.watchlistCountTextView);
+        sectionTitleTextView = findViewById(R.id.sectionTitleTextView);
     }
 
     private void setupRecyclerView() {
@@ -100,15 +102,29 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private void loadMoviesFromTMDB() {
-        Toast.makeText(this, "Loading movies from TMDB...", Toast.LENGTH_SHORT).show();
+    private void loadMoviesForUser() {
+        int userId = sessionManager.getUserId();
+        // Retrieve the user's favoriteGenres from DB, then fetch TMDB movies by genre
+        repository.getFavoriteGenres(userId, genres -> {
+            if (genres != null && !genres.isEmpty()) {
+                // Convert genre names to TMDB IDs
+                List<Integer> genreIds = GenreSelectionActivity.getGenreIdsForNames(genres);
+                loadMoviesByGenres(genreIds);
+            } else {
+                // No genres selected — fall back to popular movies
+                loadPopularMovies();
+            }
+        });
+    }
 
-        tmdbRepository.getPopularMovies(1, new TMDBRepository.RepositoryCallback<List<Movie>>() {
+    private void loadMoviesByGenres(List<Integer> genreIds) {
+        if (sectionTitleTextView != null)
+            sectionTitleTextView.setText(getString(R.string.personalized_for_you));
+        tmdbRepository.getMoviesByGenreIds(genreIds, 1, new TMDBRepository.RepositoryCallback<List<Movie>>() {
             @Override
             public void onSuccess(List<Movie> movies) {
                 movieList.clear();
                 movieList.addAll(movies);
-                // Sync watchlist state from DB
                 syncWatchlistState();
                 movieAdapter.notifyDataSetChanged();
             }
@@ -116,7 +132,28 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onError(String errorMessage) {
                 Toast.makeText(HomeActivity.this,
-                    "Error loading movies: " + errorMessage, Toast.LENGTH_LONG).show();
+                        "Error loading personalised movies: " + errorMessage, Toast.LENGTH_SHORT).show();
+                loadPopularMovies();
+            }
+        });
+    }
+
+    private void loadPopularMovies() {
+        if (sectionTitleTextView != null)
+            sectionTitleTextView.setText(getString(R.string.popular_movies));
+        tmdbRepository.getPopularMovies(1, new TMDBRepository.RepositoryCallback<List<Movie>>() {
+            @Override
+            public void onSuccess(List<Movie> movies) {
+                movieList.clear();
+                movieList.addAll(movies);
+                syncWatchlistState();
+                movieAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Toast.makeText(HomeActivity.this,
+                        "Error loading movies: " + errorMessage, Toast.LENGTH_LONG).show();
                 loadDemoMovies();
             }
         });

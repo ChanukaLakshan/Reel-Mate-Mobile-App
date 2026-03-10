@@ -30,6 +30,11 @@
             android:name=".ForgotPasswordActivity"
             android:exported="false" />
 
+        <!-- Genre Selection Activity -->
+        <activity
+            android:name=".GenreSelectionActivity"
+            android:exported="false" />
+
         <!-- Home Activity -->
         <activity
             android:name=".HomeActivity"
