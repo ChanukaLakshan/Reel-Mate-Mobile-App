@@ -31,5 +31,8 @@ public interface MovieListDao {
 
     @Query("SELECT * FROM movie_lists WHERE id = :listId LIMIT 1")
     MovieListEntity getListById(int listId);
+
+    @Query("SELECT COUNT(*) FROM movie_lists WHERE userId = :userId")
+    LiveData<Integer> getListsCount(int userId);
 }
 
