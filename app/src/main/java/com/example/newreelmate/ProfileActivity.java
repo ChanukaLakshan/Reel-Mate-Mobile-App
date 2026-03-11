@@ -8,9 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.newreelmate.database.ReelMateRepository;
 import com.example.newreelmate.database.SessionManager;
@@ -21,6 +21,9 @@ public class ProfileActivity extends AppCompatActivity {
     private ActivityResultLauncher<String> pickImageLauncher;
     private TextView userNameTextView;
     private TextView userEmailTextView;
+    private TextView moviesWatchedTextView;
+    private TextView listsCreatedTextView;
+    private TextView reviewsWrittenTextView;
     private ImageView profileImageView;
     private SessionManager sessionManager;
     private ReelMateRepository repository;
@@ -33,12 +36,18 @@ public class ProfileActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         repository = new ReelMateRepository(this);
 
-        userNameTextView = findViewById(R.id.userNameTextView);
-        userEmailTextView = findViewById(R.id.userEmailTextView);
-        profileImageView = findViewById(R.id.profileImageView);
+        userNameTextView      = findViewById(R.id.userNameTextView);
+        userEmailTextView     = findViewById(R.id.userEmailTextView);
+        profileImageView      = findViewById(R.id.profileImageView);
+        moviesWatchedTextView = findViewById(R.id.moviesWatchedTextView);
+        listsCreatedTextView  = findViewById(R.id.listsCreatedTextView);
+        reviewsWrittenTextView = findViewById(R.id.reviewsWrittenTextView);
 
-        // Load user from DB
+        // Load user profile from DB
         loadUserProfile();
+
+        // Observe stats – auto-updates whenever DB changes
+        loadProfileStats();
 
         // Image picker launcher
         pickImageLauncher = registerForActivityResult(
@@ -65,8 +74,8 @@ public class ProfileActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    String name = result.getData().getStringExtra("PROFILE_NAME");
-                    String email = result.getData().getStringExtra("PROFILE_EMAIL");
+                    String name     = result.getData().getStringExtra("PROFILE_NAME");
+                    String email    = result.getData().getStringExtra("PROFILE_EMAIL");
                     String photoUri = result.getData().getStringExtra("PROFILE_PHOTO_URI");
                     if (name != null && !name.trim().isEmpty()) {
                         userNameTextView.setText(name.trim());
@@ -89,14 +98,14 @@ public class ProfileActivity extends AppCompatActivity {
         ImageView changePhotoButton = findViewById(R.id.changePhotoButton);
         changePhotoButton.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
 
-        Button editProfileButton = findViewById(R.id.editProfileButton);
-        Button settingsButton = findViewById(R.id.settingsButton);
+        Button editProfileButton  = findViewById(R.id.editProfileButton);
+        Button settingsButton     = findViewById(R.id.settingsButton);
         Button changeGenresButton = findViewById(R.id.changeGenresButton);
-        Button logoutButton = findViewById(R.id.logoutButton);
+        Button logoutButton       = findViewById(R.id.logoutButton);
 
         editProfileButton.setOnClickListener(v -> {
             Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-            intent.putExtra("PROFILE_NAME", userNameTextView.getText().toString());
+            intent.putExtra("PROFILE_NAME",  userNameTextView.getText().toString());
             intent.putExtra("PROFILE_EMAIL", userEmailTextView.getText().toString());
             String photoUri = sessionManager.getProfilePhotoUri();
             if (photoUri != null) intent.putExtra("PROFILE_PHOTO_URI", photoUri);
@@ -163,5 +172,22 @@ public class ProfileActivity extends AppCompatActivity {
             String cachedUri = sessionManager.getProfilePhotoUri();
             if (cachedUri != null) profileImageView.setImageURI(Uri.parse(cachedUri));
         }
+    }
+
+    private void loadProfileStats() {
+        int userId = sessionManager.getUserId();
+        if (userId == -1) return;
+
+        repository.getMoviesWatchedCount(userId)
+            .observe(this, count ->
+                moviesWatchedTextView.setText(String.valueOf(count != null ? count : 0)));
+
+        repository.getListsCount(userId)
+            .observe(this, count ->
+                listsCreatedTextView.setText(String.valueOf(count != null ? count : 0)));
+
+        repository.getReviewsCount(userId)
+            .observe(this, count ->
+                reviewsWrittenTextView.setText(String.valueOf(count != null ? count : 0)));
     }
 }

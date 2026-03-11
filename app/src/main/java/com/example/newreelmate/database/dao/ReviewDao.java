@@ -34,5 +34,8 @@ public interface ReviewDao {
 
     @Query("SELECT AVG(rating) FROM reviews WHERE movieId = :movieId")
     float getAverageRating(int movieId);
+
+    @Query("SELECT COUNT(*) FROM reviews WHERE userId = :userId")
+    LiveData<Integer> getReviewsCount(int userId);
 }
 

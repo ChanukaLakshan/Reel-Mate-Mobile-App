@@ -40,5 +40,8 @@ public interface WatchlistDao {
 
     @Query("SELECT COUNT(*) FROM watchlist WHERE userId = :userId AND isWatched = 1")
     int getWatchedCount(int userId);
+
+    @Query("SELECT COUNT(*) FROM watchlist WHERE userId = :userId AND isWatched = 1")
+    LiveData<Integer> getWatchedCountLive(int userId);
 }
 

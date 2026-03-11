@@ -125,6 +125,18 @@ public class ReelMateRepository {
         return watchlistDao.getWatchlistCount(userId);
     }
 
+    public LiveData<Integer> getMoviesWatchedCount(int userId) {
+        return watchlistDao.getWatchedCountLive(userId);
+    }
+
+    public LiveData<Integer> getListsCount(int userId) {
+        return movieListDao.getListsCount(userId);
+    }
+
+    public LiveData<Integer> getReviewsCount(int userId) {
+        return reviewDao.getReviewsCount(userId);
+    }
+
     public void addToWatchlist(int userId, int movieId, String title, String poster,
                                String year, double rating, Callback<Boolean> callback) {
         executor.execute(() -> {
