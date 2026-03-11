@@ -9,11 +9,13 @@ import androidx.lifecycle.LiveData;
 import com.example.newreelmate.database.Converters;
 import com.example.newreelmate.database.dao.MovieListDao;
 import com.example.newreelmate.database.dao.MovieListItemDao;
+import com.example.newreelmate.database.dao.NotificationDao;
 import com.example.newreelmate.database.dao.ReviewDao;
 import com.example.newreelmate.database.dao.UserDao;
 import com.example.newreelmate.database.dao.WatchlistDao;
 import com.example.newreelmate.database.entities.MovieListEntity;
 import com.example.newreelmate.database.entities.MovieListItemEntity;
+import com.example.newreelmate.database.entities.NotificationEntity;
 import com.example.newreelmate.database.entities.ReviewEntity;
 import com.example.newreelmate.database.entities.UserEntity;
 import com.example.newreelmate.database.entities.WatchlistEntity;
@@ -29,6 +31,7 @@ public class ReelMateRepository {
     private final MovieListDao movieListDao;
     private final MovieListItemDao movieListItemDao;
     private final ReviewDao reviewDao;
+    private final NotificationDao notificationDao;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -39,11 +42,12 @@ public class ReelMateRepository {
 
     public ReelMateRepository(Context context) {
         AppDatabase db = AppDatabase.getInstance(context);
-        userDao = db.userDao();
-        watchlistDao = db.watchlistDao();
-        movieListDao = db.movieListDao();
+        userDao          = db.userDao();
+        watchlistDao     = db.watchlistDao();
+        movieListDao     = db.movieListDao();
         movieListItemDao = db.movieListItemDao();
-        reviewDao = db.reviewDao();
+        reviewDao        = db.reviewDao();
+        notificationDao  = db.notificationDao();
     }
 
     // ─── USER ────────────────────────────────────────────────────────────────
@@ -291,6 +295,30 @@ public class ReelMateRepository {
                 mainHandler.post(() -> callback.onResult(-1));
             }
         });
+    }
+
+    // ─── NOTIFICATIONS ────────────────────────────────────────────────────────
+
+    public void addNotification(int userId, String type, String title, String message) {
+        executor.execute(() ->
+            notificationDao.insertNotification(new NotificationEntity(userId, type, title, message))
+        );
+    }
+
+    public LiveData<List<NotificationEntity>> getNotifications(int userId) {
+        return notificationDao.getNotificationsForUser(userId);
+    }
+
+    public LiveData<Integer> getUnreadNotificationCount(int userId) {
+        return notificationDao.getUnreadCount(userId);
+    }
+
+    public void markAllNotificationsRead(int userId) {
+        executor.execute(() -> notificationDao.markAllAsRead(userId));
+    }
+
+    public void clearAllNotifications(int userId) {
+        executor.execute(() -> notificationDao.clearAll(userId));
     }
 }
 

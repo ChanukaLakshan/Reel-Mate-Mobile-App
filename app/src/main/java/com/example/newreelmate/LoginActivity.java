@@ -82,6 +82,13 @@ public class LoginActivity extends AppCompatActivity {
                 loginButton.setEnabled(true);
                 if (user != null) {
                     sessionManager.saveSession(user.id, user.name, user.email);
+                    // Welcome notification
+                    repository.addNotification(
+                        user.id,
+                        "welcome",
+                        "Welcome back, " + user.name + "! 👋",
+                        "You have successfully logged in to ReelMate."
+                    );
                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                     finish();
                 } else {
@@ -101,6 +108,13 @@ public class LoginActivity extends AppCompatActivity {
                 if (userId != null && userId > 0) {
                     // Save session immediately
                     sessionManager.saveSession(userId, name, email);
+                    // Welcome notification for new user
+                    repository.addNotification(
+                        userId,
+                        "welcome",
+                        "Welcome to ReelMate, " + name + "! 🎬",
+                        "Your account has been created. Start exploring movies!"
+                    );
                     // Navigate to genre selection
                     Intent intent = new Intent(LoginActivity.this, GenreSelectionActivity.class);
                     intent.putExtra(GenreSelectionActivity.EXTRA_USER_ID, userId);

@@ -87,6 +87,13 @@ public class ReviewActivity extends AppCompatActivity {
         repository.submitReview(userId, userName, movieId, movieTitle, rating, reviewText, success -> {
             submitButton.setEnabled(true);
             if (success) {
+                // Add notification for review submission
+                repository.addNotification(
+                    userId,
+                    "review",
+                    "Review submitted! ⭐",
+                    "You rated \"" + movieTitle + "\" " + String.format("%.1f", rating) + "/5 stars."
+                );
                 Toast.makeText(this, "Review submitted successfully!", Toast.LENGTH_SHORT).show();
                 setResult(RESULT_OK);
                 finish();
