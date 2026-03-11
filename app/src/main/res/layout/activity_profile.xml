@@ -46,14 +46,34 @@
                 android:padding="24dp">
 
                 <!-- Profile Picture -->
-                <ImageView
-                    android:id="@+id/profileImageView"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:background="@drawable/logo_background"
-                    android:contentDescription="@string/profile"
-                    android:padding="24dp"
-                    android:src="@android:drawable/ic_menu_myplaces" />
+                <FrameLayout
+                    android:layout_width="108dp"
+                    android:layout_height="108dp">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/profileImageView"
+                        android:layout_width="104dp"
+                        android:layout_height="104dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/circle_profile_bg"
+                        android:contentDescription="@string/profile"
+                        android:scaleType="centerCrop"
+                        android:src="@android:drawable/ic_menu_myplaces"
+                        app:shapeAppearanceOverlay="@style/CircleImageView"
+                        app:strokeColor="@color/primary_yellow"
+                        app:strokeWidth="2dp" />
+
+                    <ImageView
+                        android:id="@+id/changePhotoButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="bottom|end"
+                        android:background="@drawable/button_primary"
+                        android:contentDescription="@string/change_photo"
+                        android:padding="5dp"
+                        android:src="@android:drawable/ic_menu_camera" />
+
+                </FrameLayout>
 
                 <!-- User Name -->
                 <TextView

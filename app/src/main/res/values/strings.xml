@@ -52,6 +52,7 @@
     <string name="reviews_written">Reviews Written</string>
     <string name="settings">Settings</string>
     <string name="logout">Logout</string>
+    <string name="change_photo">Change Photo</string>
 
     <!-- Common -->
     <string name="back">Back</string>

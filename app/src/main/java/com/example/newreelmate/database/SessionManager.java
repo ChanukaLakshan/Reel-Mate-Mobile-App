@@ -10,6 +10,7 @@ public class SessionManager {
     private static final String KEY_USER_NAME = "user_name";
     private static final String KEY_USER_EMAIL = "user_email";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+    private static final String KEY_PROFILE_PHOTO_URI = "profile_photo_uri";
 
     private final SharedPreferences prefs;
     private final SharedPreferences.Editor editor;
@@ -35,6 +36,15 @@ public class SessionManager {
     public void updateEmail(String email) {
         editor.putString(KEY_USER_EMAIL, email);
         editor.apply();
+    }
+
+    public void updateProfilePhotoUri(String uri) {
+        editor.putString(KEY_PROFILE_PHOTO_URI, uri);
+        editor.apply();
+    }
+
+    public String getProfilePhotoUri() {
+        return prefs.getString(KEY_PROFILE_PHOTO_URI, null);
     }
 
     public int getUserId() {
