@@ -11,11 +11,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.newreelmate.database.dao.MovieListDao;
 import com.example.newreelmate.database.dao.MovieListItemDao;
+import com.example.newreelmate.database.dao.NotificationDao;
 import com.example.newreelmate.database.dao.ReviewDao;
 import com.example.newreelmate.database.dao.UserDao;
 import com.example.newreelmate.database.dao.WatchlistDao;
 import com.example.newreelmate.database.entities.MovieListEntity;
 import com.example.newreelmate.database.entities.MovieListItemEntity;
+import com.example.newreelmate.database.entities.NotificationEntity;
 import com.example.newreelmate.database.entities.ReviewEntity;
 import com.example.newreelmate.database.entities.UserEntity;
 import com.example.newreelmate.database.entities.WatchlistEntity;
@@ -26,9 +28,10 @@ import com.example.newreelmate.database.entities.WatchlistEntity;
         WatchlistEntity.class,
         MovieListEntity.class,
         MovieListItemEntity.class,
-        ReviewEntity.class
+        ReviewEntity.class,
+        NotificationEntity.class
     },
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters.class)
@@ -41,6 +44,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract MovieListDao movieListDao();
     public abstract MovieListItemDao movieListItemDao();
     public abstract ReviewDao reviewDao();
+    public abstract NotificationDao notificationDao();
 
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -63,6 +67,22 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS notifications (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                "userId INTEGER NOT NULL," +
+                "type TEXT," +
+                "title TEXT," +
+                "message TEXT," +
+                "createdAt INTEGER NOT NULL," +
+                "isRead INTEGER NOT NULL DEFAULT 0)"
+            );
+        }
+    };
+
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
@@ -72,7 +92,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class,
                             "reelmate_db"
                     )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .fallbackToDestructiveMigration()
                     .build();
                 }
@@ -81,4 +101,3 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 }
-

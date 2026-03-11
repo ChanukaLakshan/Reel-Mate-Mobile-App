@@ -76,6 +76,8 @@
     <string name="auto_play">Playback</string>
     <string name="auto_play_trailers">Auto-play trailers</string>
     <string name="no_notifications">No notifications yet</string>
+    <string name="no_notifications_hint">Login, write reviews or create lists\nto see notifications here</string>
+    <string name="mark_all_read">Mark all read</string>
 
     <string name="reset_email">Email address</string>
     <string name="send_reset_link">Send reset link</string>

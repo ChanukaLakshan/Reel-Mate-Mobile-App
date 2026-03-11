@@ -49,6 +49,13 @@ public class CreateListActivity extends AppCompatActivity {
         int userId = sessionManager.getUserId();
         repository.createMovieList(userId, name, description, id -> {
             if (id > 0) {
+                // Add notification for list creation
+                repository.addNotification(
+                    userId,
+                    "list",
+                    "New list created! 📋",
+                    "Your list \"" + name + "\" has been created successfully."
+                );
                 Intent result = new Intent();
                 result.putExtra("LIST_NAME", name);
                 result.putExtra("LIST_DESCRIPTION", description);
