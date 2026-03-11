@@ -85,6 +85,17 @@ public class ReelMateRepository {
         });
     }
 
+    public void updateProfilePhoto(int userId, String uri, Callback<Boolean> callback) {
+        executor.execute(() -> {
+            try {
+                userDao.updateProfilePhoto(userId, uri);
+                mainHandler.post(() -> callback.onResult(true));
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onResult(false));
+            }
+        });
+    }
+
     public void resetPassword(String email, String newPassword, Callback<Boolean> callback) {
         executor.execute(() -> {
             UserEntity user = userDao.getUserByEmail(email);

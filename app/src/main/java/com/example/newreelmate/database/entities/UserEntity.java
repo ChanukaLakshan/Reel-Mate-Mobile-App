@@ -21,6 +21,7 @@ public class UserEntity {
     public String password;
     public long createdAt;
     public List<String> favoriteGenres;
+    public String profilePhotoUri;
 
     public UserEntity(String name, String email, String password) {
         this.name = name;

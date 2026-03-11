@@ -38,4 +38,7 @@ public interface UserDao {
 
     @Query("UPDATE users SET favoriteGenres = :favoriteGenres WHERE id = :id")
     void updateFavoriteGenres(int id, String favoriteGenres);
+
+    @Query("UPDATE users SET profilePhotoUri = :uri WHERE id = :id")
+    void updateProfilePhoto(int id, String uri);
 }
