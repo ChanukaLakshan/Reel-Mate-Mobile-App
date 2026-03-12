@@ -2,6 +2,11 @@ package com.example.newreelmate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,9 +31,13 @@ public class HomeActivity extends AppCompatActivity {
     private List<Movie> movieList;
     private TextView watchlistCountTextView;
     private TextView sectionTitleTextView;
+    private EditText searchEditText;
     private TMDBRepository tmdbRepository;
     private ReelMateRepository repository;
     private SessionManager sessionManager;
+
+    private final Handler searchHandler = new Handler(Looper.getMainLooper());
+    private Runnable searchRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +59,8 @@ public class HomeActivity extends AppCompatActivity {
         moviesRecyclerView = findViewById(R.id.moviesRecyclerView);
         watchlistCountTextView = findViewById(R.id.watchlistCountTextView);
         sectionTitleTextView = findViewById(R.id.sectionTitleTextView);
+        searchEditText = findViewById(R.id.searchEditText);
+        setupSearchBar();
     }
 
     private void setupRecyclerView() {
@@ -99,6 +110,57 @@ public class HomeActivity extends AppCompatActivity {
         repository.getWatchlistCount(userId).observe(this, count -> {
             int c = count != null ? count : 0;
             watchlistCountTextView.setText(getString(R.string.movies_in_watchlist, c));
+        });
+    }
+
+    private void setupSearchBar() {
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Cancel any pending search
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+                final String query = s.toString().trim();
+                if (query.isEmpty()) {
+                    // Restore the default movie list when search is cleared
+                    loadMoviesForUser();
+                } else {
+                    // Debounce: wait 500ms after user stops typing before searching
+                    searchRunnable = () -> searchMovies(query);
+                    searchHandler.postDelayed(searchRunnable, 500);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void searchMovies(String query) {
+        if (sectionTitleTextView != null)
+            sectionTitleTextView.setText(getString(R.string.search_results_for, query));
+        tmdbRepository.searchMovies(query, 1, new TMDBRepository.RepositoryCallback<List<Movie>>() {
+            @Override
+            public void onSuccess(List<Movie> movies) {
+                movieList.clear();
+                movieList.addAll(movies);
+                syncWatchlistState();
+                movieAdapter.notifyDataSetChanged();
+                if (movies.isEmpty()) {
+                    Toast.makeText(HomeActivity.this,
+                            getString(R.string.no_results_found, query), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Toast.makeText(HomeActivity.this,
+                        "Search error: " + errorMessage, Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
