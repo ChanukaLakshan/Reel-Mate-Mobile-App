@@ -87,7 +87,7 @@
             android:background="@drawable/button_primary"
             android:text="@string/genre_selection_continue"
             android:textAllCaps="false"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
             android:enabled="false"

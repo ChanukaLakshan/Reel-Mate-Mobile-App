@@ -112,7 +112,7 @@
                     android:background="@drawable/button_primary"
                     android:text="@string/add_to_list"
                     android:textAllCaps="false"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/black"
                     android:textSize="12sp"
                     android:gravity="center" />
 
@@ -121,10 +121,10 @@
                     android:layout_width="0dp"
                     android:layout_height="36dp"
                     android:layout_weight="1"
-                    android:background="@drawable/button_secondary"
+                    android:background="@drawable/button_primary"
                     android:text="@string/mark_watched"
                     android:textAllCaps="false"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/black"
                     android:textSize="12sp"
                     android:gravity="center" />
 
