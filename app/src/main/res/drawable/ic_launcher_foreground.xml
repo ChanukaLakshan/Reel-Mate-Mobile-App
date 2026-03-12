@@ -5,62 +5,91 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Yellow chat bubble right arc -->
+    <!--
+        ReelMate Logo:
+        1. Yellow speech-bubble shape (arc on right + tail at bottom)
+        2. Black thin stroke ring around reel
+        3. Red filled film-reel circle
+        4. 6 black sprocket holes
+        5. Yellow play triangle
+    -->
+
+    <!-- === YELLOW CHAT BUBBLE (right arc + bottom tail) === -->
+    <!-- Right crescent arc of the chat bubble -->
     <path
         android:fillColor="#F5C518"
-        android:pathData="M73,18 C82,24 88,35 88,47 C88,59 82,70 73,76 C78,71 81,64 81,56 C81,50 79,44 75,40 C71,35 65,31 58,29 C63,25 68,21 73,18Z" />
+        android:pathData="
+          M73,18
+          C82,24 88,35 88,47
+          C88,59 82,70 73,76
+          C78,71 81,64 81,56
+          C81,50 79,44 75,40
+          C71,35 65,31 58,29
+          C63,25 68,21 73,18Z" />
 
-    <!-- Yellow speech bubble tail bottom-left -->
+    <!-- Speech bubble tail (bottom-left pointing down) -->
     <path
         android:fillColor="#F5C518"
-        android:pathData="M36,72 L32,90 L48,78 C44,77 40,75 36,72Z" />
+        android:pathData="
+          M36,72
+          L32,90
+          L48,78
+          C44,77 40,75 36,72Z" />
 
-    <!-- Yellow full bubble circle (behind reel) cx=54 cy=47 r=29 -->
+    <!-- Full yellow bubble background circle (behind reel) -->
     <path
         android:fillColor="#F5C518"
-        android:pathData="M54,18 A29,29 0 1,1 53.999,18 Z" />
+        android:pathData="
+          M54,18
+          A29,29 0 1,1 53.999,18 Z" />
 
-    <!-- Black outline ring cx=54 cy=47 r=24 -->
+    <!-- Black outline ring around reel (slightly larger than reel) -->
     <path
         android:fillColor="#1A1A1A"
-        android:pathData="M54,23 A24,24 0 1,1 53.999,23 Z" />
+        android:pathData="
+          M54,23
+          A24,24 0 1,1 53.999,23 Z" />
 
-    <!-- Red film reel cx=54 cy=47 r=22 -->
+    <!-- Red film reel filled circle -->
     <path
         android:fillColor="#E50914"
-        android:pathData="M54,25 A22,22 0 1,1 53.999,25 Z" />
+        android:pathData="
+          M54,25
+          A22,22 0 1,1 53.999,25 Z" />
 
-    <!-- Sprocket hole top  cx=54 cy=30 r=3.8 -->
+    <!-- === 6 BLACK SPROCKET HOLES (arranged in ring around center) === -->
+
+    <!-- Top  (cx=54, cy=33) r=3.8 -->
     <path
         android:fillColor="#1A1A1A"
-        android:pathData="M54,26.2 A3.8,3.8 0 1,1 53.999,26.2 Z" />
+        android:pathData="M54,29.2 A3.8,3.8 0 1,1 53.999,29.2 Z" />
 
-    <!-- Sprocket hole bottom  cx=54 cy=64 r=3.8 -->
+    <!-- Bottom  (cx=54, cy=61) r=3.8 -->
     <path
         android:fillColor="#1A1A1A"
-        android:pathData="M54,60.2 A3.8,3.8 0 1,1 53.999,60.2 Z" />
+        android:pathData="M54,57.2 A3.8,3.8 0 1,1 53.999,57.2 Z" />
 
-    <!-- Sprocket hole top-left  cx=40.5 cy=38.5 r=3.8 -->
+    <!-- Top-Left  (cx=40.5, cy=40.5) r=3.8 -->
     <path
         android:fillColor="#1A1A1A"
-        android:pathData="M40.5,34.7 A3.8,3.8 0 1,1 40.499,34.7 Z" />
+        android:pathData="M40.5,36.7 A3.8,3.8 0 1,1 40.499,36.7 Z" />
 
-    <!-- Sprocket hole bottom-left  cx=40.5 cy=55.5 r=3.8 -->
+    <!-- Bottom-Left  (cx=40.5, cy=53.5) r=3.8 -->
     <path
         android:fillColor="#1A1A1A"
-        android:pathData="M40.5,51.7 A3.8,3.8 0 1,1 40.499,51.7 Z" />
+        android:pathData="M40.5,49.7 A3.8,3.8 0 1,1 40.499,49.7 Z" />
 
-    <!-- Sprocket hole top-right  cx=67.5 cy=38.5 r=3.8 -->
+    <!-- Top-Right  (cx=67.5, cy=40.5) r=3.8 -->
     <path
         android:fillColor="#1A1A1A"
-        android:pathData="M67.5,34.7 A3.8,3.8 0 1,1 67.499,34.7 Z" />
+        android:pathData="M67.5,36.7 A3.8,3.8 0 1,1 67.499,36.7 Z" />
 
-    <!-- Sprocket hole bottom-right  cx=67.5 cy=55.5 r=3.8 -->
+    <!-- Bottom-Right  (cx=67.5, cy=53.5) r=3.8 -->
     <path
         android:fillColor="#1A1A1A"
-        android:pathData="M67.5,51.7 A3.8,3.8 0 1,1 67.499,51.7 Z" />
+        android:pathData="M67.5,49.7 A3.8,3.8 0 1,1 67.499,49.7 Z" />
 
-    <!-- Yellow play triangle center -->
+    <!-- === YELLOW PLAY TRIANGLE (center of reel) === -->
     <path
         android:fillColor="#F5C518"
         android:pathData="M50,40 L50,54 L64,47 Z" />
